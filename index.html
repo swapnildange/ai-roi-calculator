@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Customer Support ROI Calculator | AutoSupport AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // Initialize EmailJS with your public key (only if configured)
+        // Replace YOUR_PUBLIC_KEY with your actual EmailJS public key from https://www.emailjs.com/
+        const EMAILJS_PUBLIC_KEY = "GcZ8l4aZ5K8zQdR49";// Insert YOUR_PUBLIC_KEY here
+        
+        if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== "GcZ8l4aZ5K8zQdR49") {  // Insert YOUR_PUBLIC_KEY here
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Customer Support ROI Calculator</h1>
+            <p class="subtitle">Discover how much you can save by automating your customer support</p>
+        </header>
+
+        <div class="calculator-section">
+            <div class="input-section">
+                <h2>Your Current Situation</h2>
+                
+                <div class="input-group">
+                    <label for="monthlyTickets">Monthly Customer Inquiries/Tickets</label>
+                    <input type="range" id="monthlyTickets" min="100" max="10000" value="1000" step="100">
+                    <span class="value-display" id="monthlyTicketsValue">1,000</span>
+                    <input type="number" class="manual-input" id="monthlyTicketsManual" placeholder="Enter tickets" min="100" max="10000">
+                </div>
+
+                <div class="input-group">
+                    <label for="avgResponseTime">Average Response Time</label>
+                    <input type="range" id="avgResponseTime" min="0" max="108" value="8" step="1">
+                    <span class="value-display" id="avgResponseTimeValue">4 hours</span>
+                    <div class="manual-input-wrapper">
+                        <input type="number" class="manual-input manual-input-time" id="avgResponseTimeManual" placeholder="Enter value" min="0" step="0.01">
+                        <div class="time-unit-toggle">
+                            <button type="button" class="unit-btn active" id="unitMins" onclick="switchTimeUnit('mins')">Mins</button>
+                            <button type="button" class="unit-btn" id="unitHours" onclick="switchTimeUnit('hours')">Hours</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="supportStaff">Support Staff Count</label>
+                    <input type="range" id="supportStaff" min="1" max="20" value="3" step="1">
+                    <span class="value-display" id="supportStaffValue">3 people</span>
+                    <input type="number" class="manual-input" id="supportStaffManual" placeholder="Enter staff count" min="1" max="20">
+                </div>
+
+                <div class="input-group">
+                    <label for="currentCoverage">Current Support Coverage</label>
+                    <select id="currentCoverage" class="coverage-select">
+                        <option value="45">9 hours × 5 days (Business hours)</option>
+                        <option value="80">16 hours × 5 days (Extended weekdays)</option>
+                        <option value="63">9 hours × 7 days (Business hours daily)</option>
+                        <option value="112">16 hours × 7 days (Extended daily)</option>
+                        <option value="168" selected>24 hours × 7 days (24/7 Support)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="desiredCoverage">Desired Support Coverage with AI</label>
+                    <select id="desiredCoverage" class="coverage-select">
+                        <option value="45">9 hours × 5 days (Business hours)</option>
+                        <option value="80">16 hours × 5 days (Extended weekdays)</option>
+                        <option value="63">9 hours × 7 days (Business hours daily)</option>
+                        <option value="112">16 hours × 7 days (Extended daily)</option>
+                        <option value="168" selected>24 hours × 7 days (24/7 Support)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="avgStaffCost">Average Monthly Cost per Support Agent ($)</label>
+                    <input type="range" id="avgStaffCost" min="0" max="6000" value="3500" step="100">
+                    <span class="value-display" id="avgStaffCostValue">$3,500</span>
+                    <input type="number" class="manual-input" id="avgStaffCostManual" placeholder="Enter cost" min="0" max="6000">
+                </div>
+
+                <div class="input-group">
+                    <label for="conversionRate">Current Inquiry-to-Sale Conversion Rate (%)</label>
+                    <input type="range" id="conversionRate" min="0" max="100" value="15" step="1">
+                    <span class="value-display" id="conversionRateValue">15%</span>
+                    <input type="number" class="manual-input" id="conversionRateManual" placeholder="Enter percentage" min="0" max="100" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label for="avgOrderValue">Average Order Value ($)</label>
+                    <input type="range" id="avgOrderValue" min="1" max="5000" value="150" step="1">
+                    <span class="value-display" id="avgOrderValueValue">$150.00</span>
+                    <input type="number" class="manual-input" id="avgOrderValueManual" placeholder="Enter order value" min="1" max="5000" step="0.01">
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>Your Savings with AI Automation</h2>
+                
+                <div class="metric-card highlight">
+                    <div class="metric-label">Total Monthly Benefit</div>
+                    <div class="metric-value" id="totalMonthlyBenefit">$0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 8px;">(Savings + Revenue)</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Monthly Savings</div>
+                        <div class="metric-value" id="monthlySavings">$0</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Annual Savings</div>
+                        <div class="metric-value" id="annualSavings">$0</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Additional Monthly Revenue</div>
+                        <div class="metric-value" id="additionalRevenue">$0</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Additional Annual Revenue</div>
+                        <div class="metric-value" id="additionalAnnualRevenue">$0</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Support Team Optimization</div>
+                        <div class="metric-value" id="staffOptimization">
+                            <span style="font-size: 1.2rem; display: block; margin-bottom: 5px;" id="currentStaff">3 staff</span>
+                            <span style="font-size: 1.5rem; color: #4CAF50;" id="optimizedStaff">→ 1 staff</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Time Saved per Month</div>
+                        <div class="metric-value" id="timeSaved">0 hours</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Response Time</div>
+                        <div class="metric-value" id="responseTimeReduction">
+                            <span style="font-size: 1.2rem; display: block; margin-bottom: 5px;" id="currentResponseTime">4h</span>
+                            <span style="font-size: 1.5rem; color: #4CAF50;">→ Instant</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">Conversion Rate Boost</div>
+                        <div class="metric-value" id="conversionBoost">
+                            <span style="font-size: 1.2rem; display: block; margin-bottom: 5px;" id="currentConversion">15%</span>
+                            <span style="font-size: 1.5rem; color: #4CAF50;" id="newConversion">→ 18.8%</span>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-label">ROI Timeline</div>
+                        <div class="metric-value" id="roiTimeline">0 months</div>
+                    </div>
+                </div>
+
+                <div class="insight-card" id="staffInsight" style="background: #f0f7ff; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 8px; display: none;">
+                    <h4 style="color: #667eea; margin-bottom: 10px; font-size: 1.1rem;">💡 Staff Optimization Insight</h4>
+                    <p id="staffInsightText" style="color: #555; line-height: 1.6; margin: 0;"></p>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+
+                <div class="pricing-recommendation">
+                    <h3>Recommended Plan</h3>
+                    <div id="recommendedPlan" class="plan-card">
+                        <div class="plan-name">Calculating...</div>
+                        <div class="plan-price">$0/month</div>
+                        <div class="plan-features"></div>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <button class="cta-button" onclick="showLeadForm()">Get Your Custom Quote</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Capture Modal -->
+    <div id="leadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLeadForm()">&times;</span>
+            <h2>Get Your Custom Implementation Quote</h2>
+            <form id="leadForm" onsubmit="handleLeadSubmit(event)">
+                <div class="form-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" name="companyName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactName">Your Name *</label>
+                    <input type="text" id="contactName" name="contactName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="platform">E-commerce Platform *</label>
+                    <select id="platform" name="platform" required>
+                        <option value="">Select...</option>
+                        <option value="shopify">Shopify</option>
+                        <option value="woocommerce">WooCommerce</option>
+                        <option value="magento">Magento</option>
+                        <option value="bigcommerce">BigCommerce</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="submit-button">Request Quote</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 AutoSupport AI | Pricing based on industry averages and may vary based on specific implementation</p>
+    </footer>
+
+    <script src="calculator.js"></script>
+</body>
+</html>
