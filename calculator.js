@@ -571,9 +571,7 @@ function handleLeadSubmit(event) {
     };
     
     // Check if EmailJS is configured
-    const emailJsConfigured = typeof emailjs !== 'undefined' && 
-                              typeof EMAILJS_PUBLIC_KEY !== 'undefined' && 
-                              EMAILJS_PUBLIC_KEY !== 'GcZ8l4aZ5K8zQdR49';// ENter your_public_key here
+    const emailJsConfigured = typeof emailjs !== 'undefined';
     
     if (!emailJsConfigured) {
         // EmailJS not configured - show data in console for now
